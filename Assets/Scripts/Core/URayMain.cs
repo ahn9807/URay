@@ -9,33 +9,70 @@ namespace URay
     {
         public RawImage screenImage;
         Image uRayImage;
-        public int width;
-        public int height;
 
         Texture2D mainTexture;
         List<Color> colors;
 
         public void Render()
-        {
-            width = 1280;
-            height = 720;
-            uRayImage = new Image(width, height, 25, screenImage);
+        { 
+            //Image
+            float aspectRatio = 16 / 9f;
+            int imageWidth = 1080;
+            int imageHeight = (int)(imageWidth / aspectRatio);
+            uRayImage = new Image(imageWidth, imageHeight, 25, screenImage);
             ImageBlock[] imageBlocks = uRayImage.GetImageBlocks();
+
+            //Camera
+            float viewPortHeight = 2.0f;
+            float viewPortWidth = aspectRatio * viewPortHeight;
+            float focalLength = 1.0f;
+
+            Vector3 origin = Vector3.zero;
+            Vector3 horizontal = new Vector3(viewPortWidth, 0, 0);
+            Vector3 vertical = new Vector3(0, viewPortHeight, 0);
+            Vector3 lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - new Vector3(0, 0, focalLength);
 
             foreach (ImageBlock block in imageBlocks)
             {
-                for (int x = 0; x < block.width; x++)
+                for (int y = 0; y < block.height; y++)
                 {
-                    for (int y = 0; y < block.height; y++)
+                    for (int x = 0; x < block.width; x++)
                     {
-                        Vector2 pos = block.GetPixelPosition(x, y);
-                        block.SetPixel(x, y, new Color(pos.x / width, pos.y / height, 0.25f, 1));
+                        float u = block.GetPixelPosition(x, y).x;
+                        float v = block.GetPixelPosition(x, y).y;
+                        u /= (imageWidth - 1);
+                        v /= (imageHeight - 1);
+                        Ray r = new Ray(origin, lowerLeftCorner + u * horizontal + v * vertical - origin);
+                        Color pixelColor = RayColor(r);
+                        //pixelColor = new Color(u, v, 0.25f);
+                        block.SetPixel(x, y, pixelColor);
                     }
                 }
 
                 uRayImage.PutImageBlock(block);
             }
             uRayImage.Apply();
+        }
+
+        bool HitSphere(Vector3 center, float radius, Ray r)
+        {
+            Vector3 oc = r.origin - center;
+            float a = Vector3.Dot(r.direction, r.direction);
+            float b = 2.0f * Vector3.Dot(oc, r.direction);
+            float c = Vector3.Dot(oc, oc) - radius * radius;
+            float discriminant = b * b - 4 * a * c;
+            return discriminant > 0;
+        }
+
+        Color RayColor(Ray ray)
+        {
+            if(HitSphere(new Vector3(0, 0, -1), 0.5f, ray))
+            {
+                return new Color(1, 0, 0);
+            }
+            Vector3 unitDirection = ray.direction.normalized;
+            float t = 0.5f * (unitDirection.y + 1f);
+            return (1.0f - t) * Color.white + t * new Color(0.5f, 0.7f, 1.0f, 1);
         }
     }
 }
