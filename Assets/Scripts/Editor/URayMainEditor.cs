@@ -4,13 +4,13 @@ using UnityEngine;
 using UnityEditor;
 using URay;
 
-[CustomEditor(typeof(URayMain))]
+[CustomEditor(typeof(URay_Main))]
 public class URayMainEditor : Editor
 { 
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-        URayMain uRayMain = (URayMain)target;
+        URay_Main uRayMain = (URay_Main)target;
 
         if (GUILayout.Button("Render"))
         {

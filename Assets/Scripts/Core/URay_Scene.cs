@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace URay
 {
-    public class Scene
+    public class URay_Scene
     {
-        public static bool RayIntersect(Ray ray, out Intersection hit)
+        public static bool RayIntersect(URay_Ray ray, out Intersection hit)
         {
             UnityEngine.RaycastHit h;
 
