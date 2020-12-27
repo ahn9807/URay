@@ -19,6 +19,7 @@ namespace URay
             float aspectRatio = 16 / 9f;
             int imageWidth = 1080;
             int imageHeight = (int)(imageWidth / aspectRatio);
+            screenImage.texture = null;
             uRayImage = new URay_Image(imageWidth, imageHeight, 25, screenImage);
             URay_ImageBlock[] imageBlocks = uRayImage.GetImageBlocks();
 
@@ -34,10 +35,10 @@ namespace URay
                 };
 
                 new Thread(threadStart).Start();
-                Can do threading due to raycast is implemented in Unity API Side!!
-                We have to fix this problem to accelerate our computation
+                Can't do threading due to raycast is implemented in Unity API Side!!
+                We have to fix this problem to accelerate our computations
                 */
-                RenderBlock(block, imageWidth, imageHeight, uRay_Camera);
+                StartCoroutine(IERenderBlock(block, imageWidth, imageHeight, uRay_Camera));
             }
         }
 
@@ -50,36 +51,50 @@ namespace URay
                     Color pixelColor = new Color(0, 0, 0);
                     for (int s = 0; s < spp; s++)
                     {
-                        float u = block.GetPixelPosition(x, y).x + Random.Range(0, 1f);
-                        float v = block.GetPixelPosition(x, y).y + Random.Range(0, 1f);
+                        double u = block.GetPixelPosition(x, y).x + URay_Sampler.UniformNumber();
+                        double v = block.GetPixelPosition(x, y).y + URay_Sampler.UniformNumber();
 
                         u /= (imageWidth - 1);
                         v /= (imageHeight - 1);
 
                         URay_Ray r = uRay_Camera.Sample(u, v);
-                        pixelColor += (RayColor(r) / (float)spp);
+                        Color col = (RayColor(r, 32) / (float)spp);
+                        float scale = 1.0f / spp;
+                        pixelColor += new Color(Mathf.Sqrt(scale * col.r), Mathf.Sqrt(scale * col.g), Mathf.Sqrt(scale * col.b));
                     }
                     //pixelColor = new Color(u, v, 0.25f);
+
                     block.SetPixel(x, y, pixelColor);
                 }
             }
 
             uRayImage.PutImageBlock(block);
-            uRayImage.Apply();
         }
 
-        Color RayColor(URay_Ray ray)
+        IEnumerator IERenderBlock(URay_ImageBlock block, int imageWdith, int imageHeight, URay_Camera uRay_Camera)
+        {
+            RenderBlock(block, imageWdith, imageHeight, uRay_Camera);
+            uRayImage.Apply();
+            yield return null;
+        }
+
+        Color RayColor(URay_Ray ray, int depth)
         {
             Intersection its;
+
+            if(depth <= 0)
+            {
+                return new Color(0, 0, 0);
+            }
             bool hit = URay_Scene.RayIntersect(ray, out its);
             if(hit)
             {
-                Vector3 color = 0.5f * (its.normal + Vector3.one);
-                return new Color(color.x, color.y, color.z);
+                Vector3d target = its.position + its.normal + URay_Sampler.UniformSphere();
+                return 0.5f * RayColor(new URay_Ray(its.position, target - its.position), depth -1);
             }
 
-            Vector3 unitDirection = ray.direction.normalized;
-            float t = 0.5f * (unitDirection.y + 1f);
+            Vector3d unitDirection = ray.direction.normalized;
+            float t = 0.5f * ((float)unitDirection.y + 1f);
             return (1.0f - t) * Color.white + t * new Color(0.5f, 0.7f, 1.0f, 1);
         }
     }

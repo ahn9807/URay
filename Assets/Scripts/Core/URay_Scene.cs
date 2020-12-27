@@ -10,14 +10,21 @@ namespace URay
         {
             UnityEngine.RaycastHit h;
 
-            Physics.Raycast(ray.origin, new Vector3(ray.direction.x, ray.direction.y, -ray.direction.z), out h);
+            Physics.Raycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)-ray.direction.z), out h);
 
             hit = new Intersection
             {
-                position = h.point,
-                normal = h.normal,
+                position = new Vector3d(h.point),
+                normal = new Vector3d(h.normal),
                 t = h.distance
             };
+
+            if(hit.t < 0.001)
+            {
+                hit.t = 0;
+
+                return false;
+            }
 
             return h.collider != null;
         }
