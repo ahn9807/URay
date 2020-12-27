@@ -22,7 +22,7 @@ namespace URay
         }
     }
 
-    public class RayHit
+    public class Intersection
     {
         public Vector3 position;
         public Vector3 normal;

@@ -8,6 +8,8 @@ namespace URay
     public class URayMain : MonoBehaviour
     {
         public RawImage screenImage;
+        public Camera renderCamera;
+        public GameObject tempSphere;
         Image uRayImage;
 
         Texture2D mainTexture;
@@ -23,11 +25,11 @@ namespace URay
             ImageBlock[] imageBlocks = uRayImage.GetImageBlocks();
 
             //Camera
-            float viewPortHeight = 2.0f;
-            float viewPortWidth = aspectRatio * viewPortHeight;
+            float viewPortHeight = 2f;
+            float viewPortWidth = viewPortHeight * aspectRatio;
             float focalLength = 1.0f;
 
-            Vector3 origin = Vector3.zero;
+            Vector3 origin = renderCamera.transform.position;
             Vector3 horizontal = new Vector3(viewPortWidth, 0, 0);
             Vector3 vertical = new Vector3(0, viewPortHeight, 0);
             Vector3 lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - new Vector3(0, 0, focalLength);
@@ -66,10 +68,14 @@ namespace URay
 
         Color RayColor(Ray ray)
         {
-            if(HitSphere(new Vector3(0, 0, -1), 0.5f, ray))
+            Intersection its;
+            bool hit = Scene.RayIntersect(ray, out its);
+            if(hit)
             {
-                return new Color(1, 0, 0);
+                Vector3 color = 0.5f * (its.normal + Vector3.one);
+                return new Color(color.x, color.y, color.z);
             }
+
             Vector3 unitDirection = ray.direction.normalized;
             float t = 0.5f * (unitDirection.y + 1f);
             return (1.0f - t) * Color.white + t * new Color(0.5f, 0.7f, 1.0f, 1);
