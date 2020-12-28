@@ -27,7 +27,8 @@ namespace URay
 
         public URay_Ray Sample(double u, double v)
         {
-            return new URay_Ray(origin, lowerLeftCorner + u * horizontal + v * vertical - origin);
+            Vector3d direction = lowerLeftCorner + u * horizontal + v * vertical - origin;
+            return new URay_Ray(origin, new Vector3d(direction.x, direction.y, -direction.z));
         }
     }
 
