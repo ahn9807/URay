@@ -91,7 +91,7 @@ namespace URay
 
         Color PathBruteIntegration(URay_Ray ray, URay_Scene scene, int depth)
         {
-            Intersection its;
+            URay_Intersection its;
             BSDFQueryRecord bsdfQueryRecord;
 
             if(depth <= 0)

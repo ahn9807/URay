@@ -22,7 +22,7 @@ namespace URay
         }
     }
 
-    public class Intersection
+    public class URay_Intersection
     {
         public Vector3d position;
         public Vector3d normal;
@@ -49,8 +49,9 @@ namespace URay
             return bsdf;
         }
 
-        public void coordinateSystem(Vector3 a, out Vector3 b, out Vector3 c)
-        {
+        public void OBSystem(Vector3 a, out Vector3 b, out Vector3 c)
+        { 
+            
             if(Mathf.Abs(a.x) > Mathf.Abs(a.z))
             {
                 float invLen = 1.0f / Mathf.Sqrt(a.x * a.x + a.y * a.y);
@@ -60,7 +61,12 @@ namespace URay
                 float invLen = 1.0f / Mathf.Sqrt(a.z * a.z + a.y * a.y);
                 c = new Vector3(0.0f, -a.z * invLen, a.y * invLen);
             }
+
             b = Vector3.Cross(c, a);
+
+            //b = new Vector3();
+            //c = new Vector3();
+            //Vector3.OrthoNormalize(ref n, ref b, ref c);
         }
     }
 }
