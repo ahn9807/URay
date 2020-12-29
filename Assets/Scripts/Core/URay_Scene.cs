@@ -7,10 +7,21 @@ namespace URay
     public class URay_Scene
     {
         private Dictionary<int, URay_Object> objects;
+        public URay_Integrator integrator;
+        public URay_Acceleration accerlerationStructure;
+        public Bounds bounds;
 
         public URay_Scene()
         {
             objects = new Dictionary<int, URay_Object>();
+            integrator = new URay_MatsIntegrator();
+            //accerlerationStructure = new URay_Acceleration();
+            //accerlerationStructure.InitAccelerationStructure(Callback, bounds);
+        }
+
+        public void Callback()
+        {
+            Debug.Log("Completed Dictionary Build and Object Generation in ");
         }
 
         public void AddObject(GameObject gameObject)
@@ -24,27 +35,18 @@ namespace URay
             }
         }
 
+        public URay_Integrator GetIntegrator()
+        {
+            return integrator;
+        }
+
         public bool RayIntersect(URay_Ray ray, out URay_Intersection hit)
         {
-            UnityEngine.RaycastHit h;
-
-            Physics.Raycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out h);
-
-            hit = new URay_Intersection
+            //URay_Raycast.PhysicsRaycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
+            bool isHit = URay_Raycast.PhysicsRaycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
+            if (isHit)
             {
-                position = new Vector3d(h.point),
-                normal = new Vector3d(h.normal),
-                t = h.distance,
-            };
-
-
-            if (h.transform != null && objects.ContainsKey(h.transform.gameObject.GetInstanceID()))
-            {
-                hit.tempTransform = h.transform;
-                hit.bsdf = objects[h.transform.gameObject.GetInstanceID()].bsdf;
-                hit.baryCentricCoordinate = h.barycentricCoordinate;
-                hit.uv = h.textureCoord;
-                hit.f_n = h.normal;
+                hit.bsdf = objects[hit.objectID].bsdf;
                 //If object has mesh collider.. calculate normal for shading
                 //Calcualte f_n for shading
                 /*
@@ -68,21 +70,23 @@ namespace URay
                     hit.f_n = interpolatedNormal.normalized;
                 }
                 */
-
+                hit.f_n = hit.normal;
                 hit.OBSystem(hit.f_n, out hit.f_s, out hit.f_t);
             } else
             {
                 return false;
             }
 
-            if(hit.t < 0.001)
+            if(hit.distance < 0.001)
             {
-                hit.t = 0;
+                hit.distance = 0;
 
                 return false;
             }
 
-            return h.collider != null;
+            return true;
         }
     }
+
+    
 }

@@ -24,10 +24,10 @@ namespace URay
 
     public class URay_Intersection
     {
-        public Vector3d position;
-        public Vector3d normal;
-        public double t;
-        public Transform tempTransform;
+        public Vector3 point;
+        public Vector3 normal;
+        public double distance;
+        public int objectID;
         public Mesh mesh;
         public URay_BSDF bsdf;
         public Vector3 baryCentricCoordinate;

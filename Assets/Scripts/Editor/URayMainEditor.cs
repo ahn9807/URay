@@ -32,5 +32,10 @@ public class URayMainEditor : Editor
 
             File.WriteAllBytes(path, bytes);
         }
+
+        if(GUILayout.Button("Apply"))
+        {
+            uRayMain.uRayImage.Apply();
+        }
     }
 }
