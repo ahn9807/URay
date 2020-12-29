@@ -8,7 +8,7 @@ namespace URay
     {
         public URay_Octree octree;
         public static URay_Acceleration singleton;
-        private int octreeDepth = 3;
+        private int octreeDepth = 6;
         private int objectsPerChunk = 1000;
         public delegate void CallbackMethod();
 
@@ -31,8 +31,8 @@ namespace URay
             GameObject[] gameObjects = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
 
             GameObject curGO;
-            URay_Triangle[] curTris = new URay_Triangle[] { };
-            MeshFilter curMeshFilter = null;
+            URay_Triangle[] curTris;
+            MeshFilter curMeshFilter;
             URay_Octree finalNode;
             for (int i = 0; i < gameObjects.Length; i++)
             {
@@ -40,7 +40,6 @@ namespace URay
                 if (curGO == null) continue;
                 curMeshFilter = curGO.GetComponent<MeshFilter>();
                 if (!curMeshFilter) continue;
-                curTris = new URay_Triangle[] { };
                 curTris = GetTriangles(curGO);
                 for (int k = 0; k < curTris.Length; k++)
                 {

@@ -89,8 +89,8 @@ namespace URay
         public bool ContainsTriangle(URay_Triangle triangle)
         {
             return bounds.Contains(triangle.pt0)
-                   | bounds.Contains(triangle.pt1)
-                   | bounds.Contains(triangle.pt2);
+                   && bounds.Contains(triangle.pt1)
+                   && bounds.Contains(triangle.pt2);
         }
 
         public void Clear()

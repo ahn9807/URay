@@ -25,17 +25,13 @@ namespace URay
             screenImage.texture = null;
             uRayImage = new URay_Image(imageWidth, imageHeight, 25, screenImage);
             uRayScene = new URay_Scene();
+            URay_Camera uRayCamera = new URay_Camera(renderCamera);
             URay_ImageBlock[] imageBlocks = uRayImage.GetImageBlocks();
 
             foreach(GameObject gameObject in GameObject.FindObjectsOfType<GameObject>())
             {
                 uRayScene.AddObject(gameObject);
             }
-
-            //Camera
-            URay_Camera uRay_Camera = new URay_Camera(renderCamera);
-            Thread[] threads = new Thread[imageBlocks.Length];
-            int index = 0;
 
             foreach (URay_ImageBlock block in imageBlocks)
             {
@@ -55,7 +51,8 @@ namespace URay
                 So We habe to make our own raycast system and corresponding accleration system..
                 */
                 //This code is temporary code. Use unity's default raycast system with collider
-                StartCoroutine(IERenderBlock(uRayScene, block, imageWidth, imageHeight, uRay_Camera));
+                StartCoroutine(IERenderBlock(uRayScene, block, imageWidth, imageHeight, uRayCamera));
+                //Unity Job system
             }
         }
 

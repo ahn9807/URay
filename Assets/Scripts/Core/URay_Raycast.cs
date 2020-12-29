@@ -22,32 +22,17 @@ namespace URay
 
         public static bool Raycast(Ray ray, out URay_Intersection hit)
         {
-            hit = new URay_Intersection();
-            List<URay_Intersection> hits = new List<URay_Intersection>();
-
-            hits = INTERNAL_RaycastAll(ray);
-
-            hits = SortResults(hits);
-            if (hits.Count > 0)
-            {
-                hit = hits[0];
-                return true;
-            }
-            return false;
+            return Raycast(ray.origin, ray.direction, out hit);
         }
 
         public static bool Raycast(Vector3 origin, Vector3 direction, out URay_Intersection hit)
         {
             Ray ray = new Ray(origin, direction);
-            hit = new URay_Intersection();
-            List<URay_Intersection> hits = new List<URay_Intersection>();
 
-            hits = INTERNAL_RaycastAll(ray);
+            hit = INTERNAL_Raycast(ray);
 
-            hits = SortResults(hits);
-            if (hits.Count > 0)
+            if (hit != null)
             {
-                hit = hits[0];
                 return true;
             }
             return false;
@@ -71,65 +56,54 @@ namespace URay
             return isHit;
         }
 
-        public static URay_Intersection[] RaycastAll(Ray ray)
+        static URay_Intersection INTERNAL_Raycast(Ray ray)
         {
-            return INTERNAL_RaycastAll(ray).ToArray();
-        }
-
-        static List<URay_Intersection> INTERNAL_RaycastAll(Ray ray)
-        {
-            List<URay_Intersection> hits = new List<URay_Intersection>();
+            URay_Intersection hit = null;
             URay_Octree octree = URay_Acceleration.GetOctree();
 
             if (octree.bounds.IntersectRay(ray))
             {
-                hits = RecurseOctreeBounds(octree, ray);
+                SearchOctree(octree, ray, ref hit);
             }
 
-            hits = SortResults(hits);
-            return hits;
+            return hit;
         }
 
-        static bool INTERNAL_Raycast(Ray ray, out URay_Intersection hit)
+        static void SearchOctree(URay_Octree octree, Ray ray, ref URay_Intersection hit)
         {
-            hit = new URay_Intersection();
-            List<URay_Intersection> hits = new List<URay_Intersection>();
-
-            URay_Octree octree = URay_Acceleration.GetOctree();
-
-            if (octree.bounds.IntersectRay(ray))
-            {
-                hits = RecurseOctreeBounds(octree, ray);
-            }
-
-            hits = SortResults(hits);
-            if (hits.Count > 0)
-            {
-                hit = hits[0];
-            }
-            return hits.Count > 0;
+            SearchOctree(octree, ray, ref hit, float.MaxValue);
         }
 
-        static List<URay_Intersection> RecurseOctreeBounds(URay_Octree octree, Ray ray)
+        static void SearchOctree(URay_Octree octree, Ray ray, ref URay_Intersection hit, float dist)
         {
-            List<URay_Intersection> hits = new List<URay_Intersection>();
-            float dist = 0f;
-            Vector2 baryCoord = new Vector2();
+            //If Node is Leaf Node
+            if (octree.triangles.Count != 0)
+            {
+                for (int k = 0; k < octree.triangles.Count; k++)
+                {
+                    if (TestIntersection(octree.triangles[k], ray, out float curDist, out Vector2 baryCoord))
+                    {
+                        if (curDist < dist)
+                        {
+                            hit = BuildRaycastHit(octree.triangles[k], curDist, baryCoord);
+                            dist = curDist;
+                        }
+                    }
+                }
+
+                if(dist != float.MaxValue)
+                {
+                    return;
+                }
+            }
+
             for (int i = 0; i < octree.children.Count; i++)
             {
                 if (octree.children[i].bounds.IntersectRay(ray))
                 {
-                    for (int k = 0; k < octree.children[i].triangles.Count; k++)
-                    {
-                        if (TestIntersection(octree.children[i].triangles[k], ray, out dist, out baryCoord))
-                        {
-                            hits.Add(BuildRaycastHit(octree.children[i].triangles[k], dist, baryCoord));
-                        }
-                    }
-                    hits.AddRange(RecurseOctreeBounds(octree.children[i], ray));
+                    SearchOctree(octree.children[i], ray, ref hit, dist);
                 }
             }
-            return hits;
         }
 
         static URay_Intersection BuildRaycastHit(URay_Triangle hitTriangle, float distance, Vector2 barycentricCoordinate)
@@ -147,28 +121,6 @@ namespace URay
 
         }
 
-        /// <summary>
-        /// Tests the intersection.
-        /// Implementation of the Moller/Trumbore intersection algorithm
-        /// </summary>
-        /// <returns>
-        /// Bool if the ray does intersect
-        /// out dist - the distance along the ray at the intersection point
-        /// out hitPoint -
-        /// </returns>
-        /// <param name='triangle'>
-        /// If set to <c>true</c> triangle.
-        /// </param>
-        /// <param name='ray'>
-        /// If set to <c>true</c> ray.
-        /// </param>
-        /// <param name='dist'>
-        /// If set to <c>true</c> dist.
-        /// </param>
-        /// <param name='baryCoord'>
-        /// If set to <c>true</c> barycentric coordinate of the intersection point.
-        /// </param>
-        /// http://www.cs.virginia.edu/~gfx/Courses/2003/ImageSynthesis/papers/Acceleration/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
         static bool TestIntersection(URay_Triangle triangle, Ray ray, out float dist, out Vector2 baryCoord)
         {
             baryCoord = Vector2.zero;
@@ -200,31 +152,6 @@ namespace URay
             baryCoord.x = u * invDet;
             baryCoord.y = v * invDet;
             return true;
-        }
-
-        static List<URay_Intersection> SortResults(List<URay_Intersection> input)
-        {
-
-            URay_Intersection a = new URay_Intersection();
-            URay_Intersection b = new URay_Intersection();
-            bool swapped = true;
-            while (swapped)
-            {
-                swapped = false;
-                for (int i = 1; i < input.Count; i++)
-                {
-                    if (input[i - 1].distance > input[i].distance)
-                    {
-                        a = input[i - 1];
-                        b = input[i];
-                        input[i - 1] = b;
-                        input[i] = a;
-                        swapped = true;
-                    }
-                }
-            }
-
-            return input;
         }
     }
 }

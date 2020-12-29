@@ -86,6 +86,14 @@ namespace URay
             pixels[x + y * width] = col;
         }
 
+        public void SetPixels(Color[] col)
+        {
+            for(int i=0;i<col.Length;i++)
+            {
+                pixels[i] = col[i];
+            }
+        }
+
         public Color GetPixel(int x, int y)
         {
             return pixels[x + y * width];
