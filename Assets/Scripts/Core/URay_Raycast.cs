@@ -90,11 +90,6 @@ namespace URay
                         }
                     }
                 }
-
-                if(dist != float.MaxValue)
-                {
-                    return;
-                }
             }
 
             for (int i = 0; i < octree.children.Count; i++)
@@ -113,7 +108,7 @@ namespace URay
             returnedHit.distance = distance;
             returnedHit.baryCentricCoordinate = barycentricCoordinate;
             returnedHit.uv = hitTriangle.uv_pt0 + ((hitTriangle.uv_pt1 - hitTriangle.uv_pt0) * barycentricCoordinate.x) + ((hitTriangle.uv_pt2 - hitTriangle.uv_pt0) * barycentricCoordinate.y);
-            returnedHit.normal = Vector3.Cross((hitTriangle.pt0 - hitTriangle.pt1), (hitTriangle.pt1 - hitTriangle.pt2));
+            returnedHit.normal = -(hitTriangle.n_pt0 + hitTriangle.n_pt1 + hitTriangle.n_pt2) / 3;
 
             //HACK:  Below only returns the center of the hit triangle.  A close approximate, but not accurate.  
             returnedHit.point = hitTriangle.position + (hitTriangle.pt0 + hitTriangle.pt1 + hitTriangle.pt2) / 3;

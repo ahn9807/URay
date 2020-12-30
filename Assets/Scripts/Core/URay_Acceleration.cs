@@ -75,6 +75,7 @@ namespace URay
             Mesh mesh = go.GetComponent<MeshFilter>().sharedMesh;
             int[] vIndex = mesh.triangles;
             Vector3[] verts = mesh.vertices;
+            Vector3[] normals = mesh.normals;
             Vector2[] uvs = mesh.uv;
             List<URay_Triangle> triangleList = new List<URay_Triangle>();
             int i = 0;
@@ -90,6 +91,9 @@ namespace URay
                     uvs[vIndex[i + 0]],
                     uvs[vIndex[i + 1]],
                     uvs[vIndex[i + 2]],
+                    normals[vIndex[i + 0]],
+                    normals[vIndex[i + 1]],
+                    normals[vIndex[i + 2]],
                     go.transform));
                 }
                 else
@@ -102,6 +106,9 @@ namespace URay
                     new Vector2(0, 0),
                     new Vector2(0, 0),
                     new Vector2(0, 0),
+                    normals[vIndex[i + 0]],
+                    normals[vIndex[i + 1]],
+                    normals[vIndex[i + 2]],
                     go.transform));
                 }
 

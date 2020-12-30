@@ -15,8 +15,8 @@ namespace URay
         {
             objects = new Dictionary<int, URay_Object>();
             integrator = new URay_MatsIntegrator();
-            accerlerationStructure = new URay_Acceleration();
-            accerlerationStructure.InitAccelerationStructure(Callback, bounds);
+            //accerlerationStructure = new URay_Acceleration();
+            //accerlerationStructure.InitAccelerationStructure(Callback, bounds);
         }
 
         public void Callback()
@@ -30,7 +30,7 @@ namespace URay
             if(gameObject.GetComponent<MeshRenderer>() != null)
             {
                 URay_BSDF newObjectBSDF = URay_Material.ParseBSDFFromMaterial(gameObject.GetComponent<MeshRenderer>().sharedMaterial);
-                URay_Object newURayObject = new URay_Object(gameObject.GetInstanceID(), newObjectBSDF);
+                URay_Object newURayObject = new URay_Object(gameObject.GetInstanceID(), gameObject.GetComponent<MeshFilter>().sharedMesh, newObjectBSDF);
                 objects.Add(gameObject.GetInstanceID(), newURayObject);
             }
         }
@@ -42,8 +42,8 @@ namespace URay
 
         public bool RayIntersect(URay_Ray ray, out URay_Intersection hit)
         {
-            bool isHit = URay_Raycast.Raycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
-            //bool isHit = URay_Raycast.PhysicsRaycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
+            //bool isHit = URay_Raycast.Raycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
+            bool isHit = URay_Raycast.PhysicsRaycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
             if (isHit)
             {
                 hit.bsdf = objects[hit.objectID].bsdf;

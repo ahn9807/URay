@@ -74,7 +74,7 @@ namespace URay
                         v /= (blockHeight - 1);
 
                         URay_Ray r = uRay_Camera.Sample(u, v);
-                        Color col = integrator.Li(scene, r, 5) / (float)spp;
+                        Color col = integrator.Li(scene, r, 32) / (float)spp;
                         float scale = 1.0f / spp;
                         pixelColor += new Color(Mathf.Sqrt(scale * col.r), Mathf.Sqrt(scale * col.g), Mathf.Sqrt(scale * col.b));
                     }
