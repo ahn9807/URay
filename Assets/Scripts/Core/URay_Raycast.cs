@@ -31,6 +31,12 @@ namespace URay
 
             hit = INTERNAL_Raycast(ray);
 
+            if(hit == null)
+            {
+                hit = new URay_Intersection();
+                hit.point = new Vector3(0,0,0);
+            }
+
             if (hit != null)
             {
                 return true;
@@ -77,16 +83,19 @@ namespace URay
         static void SearchOctree(URay_Octree octree, Ray ray, ref URay_Intersection hit, float dist)
         {
             //If Node is Leaf Node
-            if (octree.triangles.Count != 0)
+            if (octree.children.Count == 0)
             {
-                for (int k = 0; k < octree.triangles.Count; k++)
+                if (octree.triangles.Count != 0)
                 {
-                    if (TestIntersection(octree.triangles[k], ray, out float curDist, out Vector2 baryCoord))
+                    for (int k = 0; k < octree.triangles.Count; k++)
                     {
-                        if (curDist < dist)
+                        if (TestIntersection(octree.triangles[k], ray, out float curDist, out Vector2 baryCoord))
                         {
-                            hit = BuildRaycastHit(octree.triangles[k], curDist, baryCoord);
-                            dist = curDist;
+                            if (curDist < dist)
+                            {
+                                hit = BuildRaycastHit(octree.triangles[k], ray, curDist, baryCoord);
+                                dist = curDist;
+                            }
                         }
                     }
                 }
@@ -101,7 +110,7 @@ namespace URay
             }
         }
 
-        static URay_Intersection BuildRaycastHit(URay_Triangle hitTriangle, float distance, Vector2 barycentricCoordinate)
+        static URay_Intersection BuildRaycastHit(URay_Triangle hitTriangle, Ray ray, float distance, Vector2 barycentricCoordinate)
         {
             URay_Intersection returnedHit = new URay_Intersection();
             returnedHit.objectID = hitTriangle.objectID;
@@ -111,9 +120,8 @@ namespace URay
             returnedHit.normal = -(hitTriangle.n_pt0 + hitTriangle.n_pt1 + hitTriangle.n_pt2) / 3;
 
             //HACK:  Below only returns the center of the hit triangle.  A close approximate, but not accurate.  
-            returnedHit.point = hitTriangle.position + (hitTriangle.pt0 + hitTriangle.pt1 + hitTriangle.pt2) / 3;
+            returnedHit.point = ray.origin + ray.direction * distance;
             return returnedHit;
-
         }
 
         static bool TestIntersection(URay_Triangle triangle, Ray ray, out float dist, out Vector2 baryCoord)

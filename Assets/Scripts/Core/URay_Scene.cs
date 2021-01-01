@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 
 namespace URay
@@ -15,8 +17,8 @@ namespace URay
         {
             objects = new Dictionary<int, URay_Object>();
             integrator = new URay_MatsIntegrator();
-            //accerlerationStructure = new URay_Acceleration();
-            //accerlerationStructure.InitAccelerationStructure(Callback, bounds);
+            accerlerationStructure = new URay_Acceleration();
+            accerlerationStructure.InitAccelerationStructure(Callback, bounds);
         }
 
         public void Callback()
@@ -41,12 +43,49 @@ namespace URay
         }
 
         public bool RayIntersect(URay_Ray ray, out URay_Intersection hit)
-        {
-            //bool isHit = URay_Raycast.Raycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
-            bool isHit = URay_Raycast.PhysicsRaycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
+        {     
+            // Perform a single raycast using RaycastCommand and wait for it to complete
+            // Setup the command and result buffers
+            //var results = new NativeArray<RaycastHit>(1, Allocator.TempJob);
+
+            //var commands = new NativeArray<RaycastCommand>(1, Allocator.TempJob);
+
+            //// Set the data of the first command
+            //Vector3 origin = Vector3.forward * -10;
+
+            //Vector3 direction = Vector3.forward;
+
+            //commands[0] = new RaycastCommand(origin, direction);
+
+            //// Schedule the batch of raycasts
+            //JobHandle handle = RaycastCommand.ScheduleBatch(commands, results, 1, default(JobHandle));
+
+            //// Wait for the batch processing job to complete
+            //handle.Complete();
+
+            //// Copy the result. If batchedHit.collider is null there was no hit
+            //RaycastHit h = results[0];
+
+            //results.Dispose();
+            //commands.Dispose();
+
+            //bool isHit = h.collider != null;
+
+            //hit = new URay_Intersection();
+            //hit.normal = h.normal;
+            //hit.baryCentricCoordinate = h.barycentricCoordinate;
+            //hit.distance = h.distance;
+            //if(h.transform != null && h.transform.gameObject != null)
+            //    hit.objectID = h.transform.gameObject.GetInstanceID();
+
+            bool isHit = URay_Raycast.Raycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
+            //bool isHit = URay_Raycast.PhysicsRaycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
             if (isHit)
             {
-                hit.bsdf = objects[hit.objectID].bsdf;
+                if(objects.ContainsKey(hit.objectID))
+                {
+                    hit.bsdf = objects[hit.objectID].bsdf;
+                }
                 //If object has mesh collider.. calculate normal for shading
                 //Calcualte f_n for shading
                 /*

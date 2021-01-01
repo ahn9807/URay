@@ -35,15 +35,14 @@ namespace URay
 
             foreach (URay_ImageBlock block in imageBlocks)
             {
-                /*
-                ThreadStart threadStart = delegate
-                {
-                    RenderBlock(uRayScene, block, imageWidth, imageHeight, uRay_Camera);
-                };
+                
+                //ThreadStart threadStart = delegate
+                //{
+                //    RenderBlock(uRayScene, block, imageWidth, imageHeight, uRayCamera);
+                //};
 
-                threads[index++] = new Thread(threadStart);
-                threads[index - 1].Start();
-                */
+                //new Thread(threadStart).Start();
+                
                 /*
                 Can't do threading due to raycast is implemented in Unity API Side!!
                 We have to fix this problem to accelerate our computations

@@ -27,6 +27,48 @@ namespace URay
             CreateChildren(this, generations);
         }
 
+        public void BuildOctree(List<URay_Triangle> mesh, Bounds bounds, int generations)
+        {
+            triangles = new List<URay_Triangle>();
+            this.bounds = bounds;
+            foreach(var tri in mesh)
+            {
+                if(OverlapTriangle(tri))
+                {
+                    triangles.Add(tri);
+                }
+            }
+
+            children = new List<URay_Octree>();
+            Vector3 c = bounds.center;
+            float u = bounds.extents.x * 0.5f;
+            float v = bounds.extents.y * 0.5f;
+            float w = bounds.extents.z * 0.5f;
+            Vector3 childrenSize = bounds.extents;
+            Vector3[] childrenCenters = {
+            new Vector3(c.x + u, c.y + v, c.z + w),
+            new Vector3(c.x + u, c.y + v, c.z - w),
+            new Vector3(c.x + u, c.y - v, c.z + w),
+            new Vector3(c.x + u, c.y - v, c.z - w),
+            new Vector3(c.x - u, c.y + v, c.z + w),
+            new Vector3(c.x - u, c.y + v, c.z - w),
+            new Vector3(c.x - u, c.y - v, c.z + w),
+            new Vector3(c.x - u, c.y - v, c.z - w)
+            };
+
+            for (int i = 0; i < childrenCenters.Length; i++)
+            {
+                URay_Octree o = new URay_Octree();
+                o.parent = parent;
+                o.bounds = new Bounds(childrenCenters[i], childrenSize);
+                children.Add(o);
+                if (generations > 0)
+                {
+                    o.BuildOctree(triangles, bounds, generations - 1);
+                }
+            }
+        }
+
         protected void CreateChildren(URay_Octree parent, int generations)
         {
             children = new List<URay_Octree>();
@@ -52,6 +94,7 @@ namespace URay
                 o.parent = parent;
                 o.bounds = new Bounds(childrenCenters[i], childrenSize);
                 children.Add(o);
+
                 if(generations > 0)
                 {
                     o.CreateChildren(o, generations - 1);
@@ -84,6 +127,13 @@ namespace URay
         {
             triangles.Add(t);
             return true;
+        }
+
+        public bool OverlapTriangle(URay_Triangle triangle)
+        {
+            return bounds.Contains(triangle.pt0)
+               || bounds.Contains(triangle.pt1)
+               || bounds.Contains(triangle.pt2);
         }
 
         public bool ContainsTriangle(URay_Triangle triangle)

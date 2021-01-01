@@ -8,7 +8,7 @@ namespace URay
     {
         public URay_Octree octree;
         public static URay_Acceleration singleton;
-        private int octreeDepth = 6;
+        private int octreeDepth = 5;
         private int objectsPerChunk = 1000;
         public delegate void CallbackMethod();
 
@@ -23,10 +23,10 @@ namespace URay
             bounds.center = new Vector3(0, 0, 0);
             bounds.extents = new Vector3(10, 10, 10);
             octree = new URay_Octree(bounds, octreeDepth);
-            PopulateOctree(del);
+            BuildOctree(del);
         }
 
-        public void PopulateOctree(CallbackMethod del)
+        public void BuildOctree(CallbackMethod del)
         {
             GameObject[] gameObjects = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
 
