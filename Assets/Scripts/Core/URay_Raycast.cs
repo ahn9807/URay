@@ -83,7 +83,7 @@ namespace URay
         static void SearchOctree(URay_Octree octree, Ray ray, ref URay_Intersection hit, float dist)
         {
             //If Node is Leaf Node
-            if (octree.children.Count == 0)
+            //if (octree.children.Count == 0)
             {
                 if (octree.triangles.Count != 0)
                 {
@@ -117,7 +117,7 @@ namespace URay
             returnedHit.distance = distance;
             returnedHit.baryCentricCoordinate = barycentricCoordinate;
             returnedHit.uv = hitTriangle.uv_pt0 + ((hitTriangle.uv_pt1 - hitTriangle.uv_pt0) * barycentricCoordinate.x) + ((hitTriangle.uv_pt2 - hitTriangle.uv_pt0) * barycentricCoordinate.y);
-            returnedHit.normal = -(hitTriangle.n_pt0 + hitTriangle.n_pt1 + hitTriangle.n_pt2) / 3;
+            returnedHit.normal = (hitTriangle.n_pt0 + hitTriangle.n_pt1 + hitTriangle.n_pt2) / 3.0f;
 
             //HACK:  Below only returns the center of the hit triangle.  A close approximate, but not accurate.  
             returnedHit.point = ray.origin + ray.direction * distance;

@@ -43,14 +43,14 @@ public class URay_TestAcceleration : MonoBehaviour
             URay_Raycast.PhysicsRaycast(origin, direction, out phit);
         }
         sw.Stop();
-        Debug.Log("Unity Engine Result: " + phit.point + "[" + (sw.ElapsedMilliseconds / 1000f).ToString("F14") + "] seconds");
+        Debug.Log("Unity Engine Result: " + phit.point + " Normal: " + phit.normal + "[" + (sw.ElapsedMilliseconds / 1000f).ToString("F4") + "] seconds");
         sw.Restart();
         for(int i=0;i<1000;i++)
         {
             URay_Raycast.Raycast(origin, direction, out hit);
         }
         sw.Stop();
-        Debug.Log("Octree search Result: " + hit.point + "[" + (sw.ElapsedMilliseconds / 1000f).ToString("F14") + "] seconds");
+        Debug.Log("Octree search Result: Point:  " + hit.point + " Normal: " + hit.normal + "[" + (sw.ElapsedMilliseconds / 1000f).ToString("F4") + "] seconds");
     }
 
     private void OnDrawGizmos()

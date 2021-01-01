@@ -1,3 +1,5 @@
+//#define OCTREE
+
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
@@ -17,8 +19,10 @@ namespace URay
         {
             objects = new Dictionary<int, URay_Object>();
             integrator = new URay_MatsIntegrator();
+#if OCTREE
             accerlerationStructure = new URay_Acceleration();
             accerlerationStructure.InitAccelerationStructure(Callback, bounds);
+#endif
         }
 
         public void Callback()
@@ -43,7 +47,7 @@ namespace URay
         }
 
         public bool RayIntersect(URay_Ray ray, out URay_Intersection hit)
-        {     
+        {
             // Perform a single raycast using RaycastCommand and wait for it to complete
             // Setup the command and result buffers
             //var results = new NativeArray<RaycastHit>(1, Allocator.TempJob);
@@ -78,8 +82,11 @@ namespace URay
             //if(h.transform != null && h.transform.gameObject != null)
             //    hit.objectID = h.transform.gameObject.GetInstanceID();
 
+#if OCTREE
             bool isHit = URay_Raycast.Raycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
-            //bool isHit = URay_Raycast.PhysicsRaycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
+#else
+            bool isHit = URay_Raycast.PhysicsRaycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
+#endif
             if (isHit)
             {
                 if(objects.ContainsKey(hit.objectID))
