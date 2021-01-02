@@ -46,6 +46,7 @@ namespace URay
 
         public static bool PhysicsRaycast(Vector3 origin, Vector3 direction, out URay_Intersection uhit)
         {
+            origin = origin + direction * 0.00001f;
             bool isHit = Physics.Raycast(origin, direction, out RaycastHit hit);
 
             uhit = new URay_Intersection();
@@ -82,7 +83,6 @@ namespace URay
 
         static void SearchOctree(URay_Octree octree, Ray ray, ref URay_Intersection hit, float dist)
         {
-            //If Node is Leaf Node
             //if (octree.children.Count == 0)
             {
                 if (octree.triangles.Count != 0)

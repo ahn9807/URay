@@ -8,7 +8,7 @@ namespace URay
     {
         public URay_Octree octree;
         public static URay_Acceleration singleton;
-        private int octreeDepth = 5;
+        private int octreeDepth = 4;
         private int objectsPerChunk = 1000;
         public delegate void CallbackMethod();
 

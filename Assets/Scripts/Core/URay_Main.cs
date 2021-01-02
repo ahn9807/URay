@@ -20,7 +20,7 @@ namespace URay
         {
             //Image
             float aspectRatio = renderCamera.aspect;
-            int imageWidth = 1080;
+            int imageWidth = 720;
             int imageHeight = (int)(imageWidth / aspectRatio);
             screenImage.texture = null;
             uRayImage = new URay_Image(imageWidth, imageHeight, 25, screenImage);

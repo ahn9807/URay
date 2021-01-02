@@ -133,6 +133,4 @@ namespace URay
             return true;
         }
     }
-
-    
 }

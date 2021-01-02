@@ -110,10 +110,10 @@ namespace URay
         public URay_Octree IndexTriangle(URay_Octree parentNode, URay_Triangle triangle)
         {
             URay_Octree finalNode = parentNode;
-            if(this.ContainsTriangle(triangle))
+            if (this.ContainsTriangle(triangle))
             {
                 finalNode = this;
-                for(int i=0;i<children.Count;i++)
+                for (int i = 0; i < children.Count; i++)
                 {
                     finalNode = children[i].IndexTriangle(this, triangle);
                     if (finalNode != this) return finalNode;
