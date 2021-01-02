@@ -5,19 +5,20 @@ This is my personal projects for building physically accurate path traycer for U
 ![](http://emal.iptime.org/nextcloud/index.php/s/3rnFRGQQcpJ2WQm/preview)
 
 ## To do
--[x] Principle materials (Diffuse, Dielectric, Mirror)
--[x] Brute force integration
--[ ] Emission based sampling
--[ ] Multiple importance sampling
--[ ] Volumetric rendering
--[ ] Denoising 
--[ ] Advanced materials (Disney...)
--[ ] Enviroment Light
--[ ] Texturing
--[ ] Accelerate rendering speed
--[ ] Make robust acceleration structure for raycasting (60 times slower compare to unity's built in raycast)
--[ ] Add shader for preview materials
--[ ] And more? 
+
+- [x] Principle materials (Diffuse, Dielectric, Mirror)
+- [x] Brute force integration
+- [ ] Emission based sampling
+- [ ] Multiple importance sampling
+- [ ] Volumetric rendering
+- [ ] Denoising 
+- [ ] Advanced materials (Disney...)
+- [ ] Enviroment Light
+- [ ] Texturing
+- [ ] Accelerate rendering speed
+- [ ] Make robust acceleration structure for raycasting (60 times slower compare to unity's built in raycast)
+- [ ] Add shader for preview materials
+- [ ] And more? 
 
 ## Referencese
 1. Octree: https://forum.unity.com/threads/a-solution-for-accurate-raycasting-without-mesh-colliders.134554/
