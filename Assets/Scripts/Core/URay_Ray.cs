@@ -6,16 +6,16 @@ namespace URay
 {
     public struct URay_Ray
     {
-        public Vector3d origin;
-        public Vector3d direction;
+        public Vector3 origin;
+        public Vector3 direction;
 
-        public URay_Ray(Vector3d origin, Vector3d direction)
+        public URay_Ray(Vector3 origin, Vector3 direction)
         {
             this.origin = origin;
             this.direction = direction;
         }
 
-        public Vector3d At(double t)
+        public Vector3 At(float t)
         {
             return origin + t * direction;
         }
@@ -25,7 +25,7 @@ namespace URay
     {
         public Vector3 point;
         public Vector3 normal;
-        public double distance;
+        public float distance;
         public int objectID;
         public Mesh mesh;
         public URay_BSDF bsdf;

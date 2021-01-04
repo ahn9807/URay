@@ -6,29 +6,29 @@ namespace URay
 {
     public class URay_Camera
     {
-        public Vector3d origin;
+        public Vector3 origin;
 
-        Vector3d lowerLeftCorner;
-        Vector3d horizontal;
-        Vector3d vertical;
+        Vector3 lowerLeftCorner;
+        Vector3 horizontal;
+        Vector3 vertical;
 
         public URay_Camera(Camera renderCamera)
         {
-            double aspectRatio = renderCamera.aspect;
-            double viewPortHeight = 2.0f;
-            double viewPortWidth = viewPortHeight * aspectRatio;
-            double focalLength = 1.0f;
+            float aspectRatio = renderCamera.aspect;
+            float viewPortHeight = 2.0f;
+            float viewPortWidth = viewPortHeight * aspectRatio;
+            float focalLength = 1.0f;
 
-            this.origin = new Vector3d(renderCamera.transform.position);
-            this.horizontal = new Vector3d(viewPortWidth, 0, 0);
-            this.vertical = new Vector3d(0, viewPortHeight, 0);
-            this.lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - new Vector3d(0, 0, focalLength);
+            this.origin = renderCamera.transform.position;
+            this.horizontal = new Vector3(viewPortWidth, 0, 0);
+            this.vertical = new Vector3(0, viewPortHeight, 0);
+            this.lowerLeftCorner = origin - horizontal / 2 - vertical / 2 - new Vector3(0, 0, focalLength);
         }
 
-        public URay_Ray Sample(double u, double v)
+        public URay_Ray Sample(float u, float v)
         {
-            Vector3d direction = lowerLeftCorner + u * horizontal + v * vertical - origin;
-            return new URay_Ray(origin, new Vector3d(direction.x, direction.y, -direction.z));
+            Vector3 direction = lowerLeftCorner + u * horizontal + v * vertical - origin;
+            return new URay_Ray(origin, new Vector3(direction.x, direction.y, -direction.z));
         }
     }
 

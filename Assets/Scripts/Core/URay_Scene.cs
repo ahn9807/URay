@@ -12,7 +12,7 @@ namespace URay
     {
         private Dictionary<int, URay_Object> objects;
         public URay_Integrator integrator;
-        public URay_Acceleration accerlerationStructure;
+        public URay_OctreeAcceleration accerlerationStructure;
         public Bounds bounds;
 
         public URay_Scene()
@@ -85,7 +85,7 @@ namespace URay
 #if OCTREE
             bool isHit = URay_Raycast.Raycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
 #else
-            bool isHit = URay_Raycast.PhysicsRaycast(Vector3d.ToVector3(ray.origin), new Vector3((float)ray.direction.x, (float)ray.direction.y, (float)ray.direction.z), out hit);
+            bool isHit = URay_OctreeRaycast.PhysicsRaycast(ray.origin, ray.direction, out hit);
 #endif
             if (isHit)
             {

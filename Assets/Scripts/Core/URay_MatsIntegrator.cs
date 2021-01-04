@@ -18,15 +18,15 @@ namespace URay
             bool hit = scene.RayIntersect(ray, out its);
             if (hit)
             {
-                bsdfQueryRecord = new BSDFQueryRecord(its.ToLocal(-Vector3d.ToVector3(ray.direction)));
+                bsdfQueryRecord = new BSDFQueryRecord(its.ToLocal(-ray.direction));
                 bsdfQueryRecord.uv = its.uv;
 
                 Color albedo = its.GetBSDF().Sample(bsdfQueryRecord);
-                return albedo * Li(scene, new URay_Ray(new Vector3d(its.point), new Vector3d(its.ToWorld(bsdfQueryRecord.wo))), depth - 1);
+                return albedo * Li(scene, new URay_Ray(its.point, its.ToWorld(bsdfQueryRecord.wo)), depth - 1);
             }
 
             //background color
-            Vector3d unitDirection = ray.direction.normalized;
+            Vector3 unitDirection = ray.direction.normalized;
             float t = 0.5f * ((float)unitDirection.y + 1f);
 
             return (1.0f - t) * Color.white + t * new Color(0.5f, 0.7f, 1.0f, 1);

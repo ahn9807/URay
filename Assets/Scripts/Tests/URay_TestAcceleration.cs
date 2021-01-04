@@ -8,15 +8,17 @@ public class URay_TestAcceleration : MonoBehaviour
 {
     public Vector3 origin;
     public Vector3 direction;
-    public URay_Acceleration accerlerationStructure;
+    public URay_OctreeAcceleration accerlerationStructure;
+    public URay_LinearAcceleration linearAcc;
     public Bounds bounds;
     System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
 
     // Start is called before the first frame update
     void Start()
     {
-        accerlerationStructure = new URay_Acceleration();
+        accerlerationStructure = new URay_OctreeAcceleration();
         accerlerationStructure.InitAccelerationStructure(Callback, bounds);
+        linearAcc = new URay_LinearAcceleration();
     }
 
     void Callback()
@@ -28,8 +30,16 @@ public class URay_TestAcceleration : MonoBehaviour
     public void BuildRaycastStructure()
     {
         sw.Start();
-        accerlerationStructure = new URay_Acceleration();
+        accerlerationStructure = new URay_OctreeAcceleration();
         accerlerationStructure.InitAccelerationStructure(Callback, bounds);
+        linearAcc = new URay_LinearAcceleration();
+        foreach (GameObject go in FindObjectsOfType<GameObject>())
+        {
+            if(go != null && go.GetComponent<MeshFilter>() != null)
+            {
+                linearAcc.AddMesh(go.GetComponent<MeshFilter>().sharedMesh);
+            }
+        }
     }
 
     public void Raycast()
@@ -40,14 +50,21 @@ public class URay_TestAcceleration : MonoBehaviour
         hit = new URay_Intersection();
         for(int i=0;i<1000;i++)
         {
-            URay_Raycast.PhysicsRaycast(origin, direction, out phit);
+            URay_OctreeRaycast.PhysicsRaycast(origin, direction, out phit);
         }
         sw.Stop();
         Debug.Log("Unity Engine Result: " + phit.point + " Normal: " + phit.normal + "[" + (sw.ElapsedMilliseconds / 1000f).ToString("F4") + "] seconds");
         sw.Restart();
         for(int i=0;i<1000;i++)
         {
-            URay_Raycast.Raycast(origin, direction, out hit);
+            URay_OctreeRaycast.Raycast(origin, direction, out hit);
+        }
+        sw.Stop();
+        Debug.Log("Octree search Result: Point:  " + hit.point + " Normal: " + hit.normal + "[" + (sw.ElapsedMilliseconds / 1000f).ToString("F4") + "] seconds");
+        sw.Restart();
+        for (int i = 0; i < 1000; i++)
+        {
+            linearAcc.RayIntersect(new URay_Ray(origin, direction), out hit, false);
         }
         sw.Stop();
         Debug.Log("Octree search Result: Point:  " + hit.point + " Normal: " + hit.normal + "[" + (sw.ElapsedMilliseconds / 1000f).ToString("F4") + "] seconds");

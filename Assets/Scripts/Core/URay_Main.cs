@@ -66,8 +66,8 @@ namespace URay
                     Color pixelColor = new Color(0, 0, 0);
                     for (int s = 0; s < spp; s++)
                     {
-                        double u = block.GetPixelPosition(x, y).x + URay_Sampler.UniformNumber();
-                        double v = block.GetPixelPosition(x, y).y + URay_Sampler.UniformNumber();
+                        float u = block.GetPixelPosition(x, y).x + URay_Sampler.UniformNumber();
+                        float v = block.GetPixelPosition(x, y).y + URay_Sampler.UniformNumber();
 
                         u /= (blockWidth - 1);
                         v /= (blockHeight - 1);

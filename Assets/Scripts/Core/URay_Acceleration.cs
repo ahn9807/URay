@@ -4,142 +4,48 @@ using UnityEngine;
 
 namespace URay
 {
-    public class URay_Acceleration
+    public abstract class URay_Acceleration
     {
-        public URay_Octree octree;
-        public static URay_Acceleration singleton;
-        private int octreeDepth = 4;
-        private int objectsPerChunk = 1000;
-        public delegate void CallbackMethod();
-
-        public URay_Acceleration()
+        public abstract void AddMesh(Mesh mesh);
+        public abstract void Build();
+        public abstract bool RayIntersect(URay_Ray ray, out URay_Intersection its, bool shadowRay);
+        public static bool MeshIntersection(Mesh mesh, int triIndex, URay_Ray ray, out float ret_u, out float ret_v, out float dist)
         {
-            singleton = this;
-        }
+            Vector3 pt0 = mesh.vertices[mesh.triangles[triIndex]];
+            Vector3 pt1 = mesh.vertices[mesh.triangles[triIndex + 1]];
+            Vector3 pt2 = mesh.vertices[mesh.triangles[triIndex + 2]];
 
-        public void InitAccelerationStructure(CallbackMethod del, Bounds bounds)
-        {
-            bounds = new Bounds();
-            bounds.center = new Vector3(0, 0, 0);
-            bounds.extents = new Vector3(10, 10, 10);
-            octree = new URay_Octree(bounds, octreeDepth);
-            BuildOctree(del);
-        }
+            ret_u = 0f;
+            ret_v = 0f;
+            dist = Mathf.Infinity;
+            Vector3 edge1 = pt1 - pt0;
+            Vector3 edge2 = pt2 - pt0;
 
-        public void BuildOctree(CallbackMethod del)
-        {
-            GameObject[] gameObjects = GameObject.FindObjectsOfType(typeof(GameObject)) as GameObject[];
-
-            GameObject curGO;
-            URay_Triangle[] curTris;
-            MeshFilter curMeshFilter;
-            URay_Octree finalNode;
-            for (int i = 0; i < gameObjects.Length; i++)
+            Vector3 pVec = Vector3.Cross(ray.direction, edge2);
+            float det = Vector3.Dot(edge1, pVec);
+            if (det < Mathf.Epsilon)
             {
-                curGO = gameObjects[i];
-                if (curGO == null) continue;
-                curMeshFilter = curGO.GetComponent<MeshFilter>();
-                if (!curMeshFilter) continue;
-                curTris = GetTriangles(curGO);
-                for (int k = 0; k < curTris.Length; k++)
-                {
-                    finalNode = octree.IndexTriangle(curTris[k]);
-                    finalNode.AddTriangle(curTris[k]);
-                }
-
-                if (i % objectsPerChunk == 1)
-                {
-                    return;
-                }
+                return false;
             }
-
-            del();
-            Debug.Log("Created Database");
-            Debug.Log("Total Indexed Triangles: " + GetTriangleCount(octree));
-
-        }
-
-        int GetTriangleCount(URay_Octree o)
-        {
-            int count = 0;
-            count = o.triangles.Count;
-            foreach (URay_Octree oct in o.children)
+            Vector3 tVec = ray.origin - pt0;
+            float u = Vector3.Dot(tVec, pVec);
+            if (u < 0 || u > det)
             {
-                count += GetTriangleCount(oct);
+                return false;
             }
-            return count;
-        }
-
-        URay_Triangle[] GetTriangles(GameObject go)
-        {
-            Mesh mesh = go.GetComponent<MeshFilter>().sharedMesh;
-            int[] vIndex = mesh.triangles;
-            Vector3[] verts = mesh.vertices;
-            Vector3[] normals = mesh.normals;
-            Vector2[] uvs = mesh.uv;
-            List<URay_Triangle> triangleList = new List<URay_Triangle>();
-            int i = 0;
-            while (i < vIndex.Length)
+            Vector3 qVec = Vector3.Cross(tVec, edge1);
+            float v = Vector3.Dot(ray.direction, qVec);
+            if (v < 0 || u + v > det)
             {
-                if (uvs.Length != 0)
-                {
-                    triangleList.Add(
-                    new URay_Triangle(
-                    verts[vIndex[i + 0]],
-                    verts[vIndex[i + 1]],
-                    verts[vIndex[i + 2]],
-                    uvs[vIndex[i + 0]],
-                    uvs[vIndex[i + 1]],
-                    uvs[vIndex[i + 2]],
-                    normals[vIndex[i + 0]],
-                    normals[vIndex[i + 1]],
-                    normals[vIndex[i + 2]],
-                    go.transform));
-                }
-                else
-                {
-                    triangleList.Add(
-                    new URay_Triangle(
-                    verts[vIndex[i + 0]],
-                    verts[vIndex[i + 1]],
-                    verts[vIndex[i + 2]],
-                    new Vector2(0, 0),
-                    new Vector2(0, 0),
-                    new Vector2(0, 0),
-                    normals[vIndex[i + 0]],
-                    normals[vIndex[i + 1]],
-                    normals[vIndex[i + 2]],
-                    go.transform));
-                }
-
-                i += 3;
+                return false;
             }
-            return triangleList.ToArray();
-        }
+            dist = Vector3.Dot(edge2, qVec);
+            float invDet = 1 / det;
+            dist *= invDet;
+            ret_u = u * invDet;
+            ret_v = v * invDet;
 
-        //This is slow and really not necessary, just a nice visual
-        public void DrawOctree(URay_Octree oct)
-        {
-            Gizmos.DrawWireCube(oct.bounds.center, oct.bounds.size);
-
-            foreach (URay_Octree o in oct.children)
-            {
-                DrawOctree(o);
-            }
-        }
-
-        public static URay_Octree GetOctree()
-        {
-            return singleton.octree;
-        }
-
-        //Get an approximation of memory usage out of the garbage collector while purposely clearing out the tree
-        void Destroy()
-        {
-            Debug.Log("Mem Before Clear: " + System.GC.GetTotalMemory(true) / 1024f / 1024f);
-            octree.Clear();
-            octree = null;
-            Debug.Log("Mem After Clear: " + System.GC.GetTotalMemory(true) / 1024f / 1024f);
+            return true;
         }
     }
 }
