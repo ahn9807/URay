@@ -20,7 +20,7 @@ This is my personal projects for building physically accurate path traycer for U
 - [ ] Add shader for preview materials
 - [ ] And more? 
 
-## Referencese
+## References
 1. Octree: https://forum.unity.com/threads/a-solution-for-accurate-raycasting-without-mesh-colliders.134554/
 2. Basic Implementations: https://github.com/ahn9807/nori/tree/master/src
-3. Basic Implementations: https://raytracing.github.io/books/RayTracingInOneWeekend.html (It's greate!)
+3. Basic Implementations: https://raytracing.github.io/books/RayTracingInOneWeekend.html (It's great!)
