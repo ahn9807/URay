@@ -2,7 +2,7 @@
 This is my personal projects for building physically accurate path traycer for Unity. I plan to make path traycer which could rendering all the unity's object with easy and simple steps. My ultimate goal is making raytracer for rendering scene of unity just like that of blender. 
 
 ## Current showcases
-![](http://emal.iptime.org/nextcloud/index.php/s/3rnFRGQQcpJ2WQm/preview)
+![](https://raw.githubusercontent.com/ahn9807/ImageBase/main/URay/result7.png?token=AINBGEXK6ETGI3OJAZDWUZTAN277G)
 
 ## To do
 
